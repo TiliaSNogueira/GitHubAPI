@@ -70,7 +70,7 @@ class UsersListFragment : Fragment(), UsersListAdapter.SelectUserOnClickListener
                     loading.show()
                 }
                 is ViewState.Error -> {
-                    errorDialog.show()
+                    errorDialog.show(it.errorMessage)
                     loading.dismiss()
                 }
                 is ViewState.Success -> {

@@ -7,5 +7,6 @@
 
     <string name="search_user_search_text">Pesquisar usuário</string>
     <string name="repositories">Repositories</string>
-    <string name="something_went_wrong">Ops! Algo deu errado :(</string>
+    <string name="something_went_wrong">Ops! Algo deu errado...</string>
+    <string name="error_button_ok">Ok</string>
 </resources>

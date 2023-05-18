@@ -58,7 +58,7 @@ class UserFragment : Fragment() {
                     loading.show()
                 }
                 is ViewState.Error -> {
-                    errorDialog.show()
+                    errorDialog.show(it.errorMessage)
                     loading.dismiss()
                 }
                 is ViewState.Success -> {
@@ -77,7 +77,7 @@ class UserFragment : Fragment() {
                     loading.show()
                 }
                 is ViewState.Error -> {
-                    errorDialog.show()
+                    errorDialog.show(it.errorMessage)
                     loading.dismiss()
                 }
                 is ViewState.Success -> {

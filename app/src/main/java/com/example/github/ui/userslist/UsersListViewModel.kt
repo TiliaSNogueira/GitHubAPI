@@ -34,7 +34,8 @@ class UsersListViewModel(private val repository: Repository) : ViewModel() {
                     }
                     is ApiResult.Error -> {
                         withContext(coroutineContext) {
-                            usersList.value = ViewState.Error(result.message)
+                            val message = result.message.substringAfter(":").substringBefore(",")
+                            usersList.value = ViewState.Error(message)
                         }
                     }
                 }
@@ -57,7 +58,8 @@ class UsersListViewModel(private val repository: Repository) : ViewModel() {
                     }
                     is ApiResult.Error -> {
                         withContext(coroutineContext) {
-                            usersList.value = ViewState.Error(result.message)
+                            val message = result.message.substringAfter(":").substringBefore(",")
+                            usersList.value = ViewState.Error(message)
                         }
                     }
                 }

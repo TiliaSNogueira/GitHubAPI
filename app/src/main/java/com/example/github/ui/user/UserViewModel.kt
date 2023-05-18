@@ -41,7 +41,8 @@ class UserViewModel(private val repository: Repository) : ViewModel() {
                     }
                     is ApiResult.Error -> {
                         withContext(coroutineContext) {
-                            user.value = ViewState.Error(result.message)
+                            val message = result.message.substringAfter(":").substringBefore(",")
+                            user.value = ViewState.Error(message)
                         }
                     }
                 }
@@ -64,9 +65,9 @@ class UserViewModel(private val repository: Repository) : ViewModel() {
                     }
                     is ApiResult.Error -> {
                         withContext(coroutineContext) {
-                            repositories.value = ViewState.Error(result.message)
+                            val message = result.message.substringAfter(":").substringBefore(",")
+                            repositories.value = ViewState.Error(message)
                         }
-
                     }
                 }
             } catch (e: Exception) {
