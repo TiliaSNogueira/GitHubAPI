@@ -13,6 +13,8 @@ interface GitHubAPI {
 
     @GET("users")
     suspend fun getAllUsers(
+        @Query("since") since: Int,
+        @Query("per_page") perPage: Int = 20
     ): Response<List<UsersListResponse>>
 
     @GET("search/users")

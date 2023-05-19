@@ -16,21 +16,24 @@ import kotlinx.coroutines.withContext
 class UsersListViewModel(private val repository: Repository) : ViewModel() {
 
     var usersList = MutableLiveData<ViewState<List<UserListModel>>>()
-
+    var usersListSearch = MutableLiveData<ViewState<List<UserListModel>>>()
     private val mapperUser = UserListMapper()
     private val mapperSearch = UserSearchMapper()
+
+    private var since: Int = 0
 
 
     fun getAllUsers() {
         viewModelScope.launch {
             usersList.value = ViewState.Loading
             try {
-                when (val result = repository.getAllUsers()) {
+                when (val result = repository.getAllUsers(since)) {
                     is ApiResult.Success -> {
                         withContext(coroutineContext) {
                             val list = mapperUser.mapFrom(result.data)
                             usersList.value = ViewState.Success(list)
                         }
+                        since = +20
                     }
                     is ApiResult.Error -> {
                         withContext(coroutineContext) {
@@ -47,19 +50,19 @@ class UsersListViewModel(private val repository: Repository) : ViewModel() {
 
     fun getSearchUser(userName: String) {
         viewModelScope.launch {
-            usersList.value = ViewState.Loading
+            usersListSearch.value = ViewState.Loading
             try {
                 when (val result = repository.getSearchUser(userName)) {
                     is ApiResult.Success -> {
                         withContext(coroutineContext) {
                             val list = mapperSearch.mapFrom(result.data.items)
-                            usersList.value = ViewState.Success(list)
+                            usersListSearch.value = ViewState.Success(list)
                         }
                     }
                     is ApiResult.Error -> {
                         withContext(coroutineContext) {
                             val message = result.message.substringAfter(":").substringBefore(",")
-                            usersList.value = ViewState.Error(message)
+                            usersListSearch.value = ViewState.Error(message)
                         }
                     }
                 }
@@ -68,4 +71,6 @@ class UsersListViewModel(private val repository: Repository) : ViewModel() {
             }
         }
     }
+
+
 }

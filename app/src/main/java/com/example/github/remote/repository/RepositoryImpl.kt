@@ -10,9 +10,9 @@ import com.example.github.remote.responses.UsersListResponse
 
 class RepositoryImpl(private val api: GitHubAPI) : Repository {
 
-    override suspend fun getAllUsers(): ApiResult<List<UsersListResponse>> {
+    override suspend fun getAllUsers(since: Int): ApiResult<List<UsersListResponse>> {
         val result = getResult {
-            api.getAllUsers()
+            api.getAllUsers(since)
         }
         return result
     }

@@ -8,7 +8,7 @@ import com.example.github.remote.responses.UsersListResponse
 
 interface Repository {
 
-    suspend fun getAllUsers(): ApiResult<List<UsersListResponse>>
+    suspend fun getAllUsers(since: Int): ApiResult<List<UsersListResponse>>
 
     suspend fun getSearchUser(userName: String): ApiResult<UserSearchListResponse>
 

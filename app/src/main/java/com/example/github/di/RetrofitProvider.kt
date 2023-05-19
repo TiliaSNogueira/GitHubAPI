@@ -1,6 +1,7 @@
 package com.example.github.di
 
 import android.content.Context
+import com.example.github.Constants.BASE_URL
 import com.example.github.network.NetworkReachabilityInterceptor
 import com.example.github.network.NetworkStateChecker
 import com.example.github.network.NetworkStateCheckerImpl
@@ -12,19 +13,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class RetrofitProvider(context: Context) {
-    val baseUrl = "https://api.github.com/"
-
-
-
-//    private val retrofit =
-//        Retrofit.Builder()
-//            .baseUrl(baseUrl)
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//
-//    val api: GitHubAPI by lazy {
-//        retrofit.create(GitHubAPI::class.java)
-//    }
 
 
     private val networkStateChecker by lazy {
@@ -55,7 +43,7 @@ class RetrofitProvider(context: Context) {
 
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(baseUrl).client(okHttpClient)
+            .baseUrl(BASE_URL).client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create()).build()
     }
 

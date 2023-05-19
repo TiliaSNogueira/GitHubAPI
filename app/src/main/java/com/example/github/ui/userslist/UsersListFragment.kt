@@ -8,6 +8,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.github.databinding.FragmentUsersListBinding
 import com.example.github.model.UserListModel
 import com.example.github.network.ViewState
@@ -20,7 +21,10 @@ class UsersListFragment : Fragment(), UsersListAdapter.SelectUserOnClickListener
     private val viewModel: UsersListViewModel by viewModel()
     private lateinit var binding: FragmentUsersListBinding
     private lateinit var adapter: UsersListAdapter
-    private var querySearch: String = ""
+    private lateinit var llmanager: LinearLayoutManager
+
+    private var flagPagination = 0
+    private var list: ArrayList<UserListModel> = arrayListOf()
 
     private val loading: Loading by lazy { Loading(this.requireActivity()) }
     private val errorDialog: ErrorDialog by lazy { ErrorDialog(this.requireActivity()) }
@@ -39,6 +43,7 @@ class UsersListFragment : Fragment(), UsersListAdapter.SelectUserOnClickListener
         setupRecyclerView()
         loadUsersList()
         setupSearch()
+        setScrollView()
     }
 
     private fun setupSearch() {
@@ -56,7 +61,8 @@ class UsersListFragment : Fragment(), UsersListAdapter.SelectUserOnClickListener
     private fun setupRecyclerView() {
         adapter = UsersListAdapter(this)
         binding.recycler.adapter = adapter
-        binding.recycler.layoutManager = LinearLayoutManager(context)
+        llmanager = LinearLayoutManager(context)
+        binding.recycler.layoutManager = llmanager
     }
 
     private fun loadUsersList() {
@@ -67,16 +73,30 @@ class UsersListFragment : Fragment(), UsersListAdapter.SelectUserOnClickListener
         viewModel.usersList.observe(viewLifecycleOwner) {
             when (it) {
                 is ViewState.Loading -> {
-                    loading.show()
+                    showLoading()
                 }
                 is ViewState.Error -> {
                     errorDialog.show(it.errorMessage)
-                    loading.dismiss()
+                    hideLoading()
                 }
                 is ViewState.Success -> {
-                    val users = it.data
-                    adapter.setData(users)
-                    loading.dismiss()
+                    list.addAll(it.data)
+                    adapter.setData(list)
+                    hideLoading()
+                }
+                else -> Unit
+            }
+        }
+
+        viewModel.usersListSearch.observe(viewLifecycleOwner) {
+            when (it) {
+                is ViewState.Loading -> {
+                }
+                is ViewState.Error -> {
+                    errorDialog.show(it.errorMessage)
+                }
+                is ViewState.Success -> {
+                    adapter.setData(it.data)
                 }
                 else -> Unit
             }
@@ -90,12 +110,45 @@ class UsersListFragment : Fragment(), UsersListAdapter.SelectUserOnClickListener
 
     private fun loadSearchList(query: String): Boolean {
         if (query.isNotEmpty()) {
-            querySearch = query
-            viewModel.getSearchUser(querySearch)
+            viewModel.getSearchUser(query)
         } else if (query.isEmpty() || query == "") {
             viewModel.getAllUsers()
         }
         return false
     }
+
+    private fun setScrollView() {
+        binding.recycler.run {
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val adapItens = adapter?.itemCount
+                    val lastItenVisible = llmanager.findLastVisibleItemPosition()
+
+                    if (adapItens != null) {
+                        if (lastItenVisible == adapItens - 1) {
+                            viewModel.getAllUsers()
+                            flagPagination++
+                        }
+                    }
+                }
+            })
+        }
+    }
+
+    private fun showLoading() {
+        if (flagPagination == 0) {
+            loading.show()
+        } else {
+            binding.progressHorizontal.visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideLoading() {
+        binding.progressHorizontal.visibility = View.INVISIBLE
+        loading.dismiss()
+    }
+
 
 }
